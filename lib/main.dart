@@ -23,25 +23,25 @@ class _MyAppState extends State<MyApp> {
       'question': 'what your favorite color?',
       'answers': ['red', 'blue', 'Green', 'black'],
       'correctAnswer': 'red',
-      'key': 'question_one'
+      'key': 'Step 1'
     },
     {
       'question': 'what your favorite animal?',
       'answers': ['dog', 'cat', 'lino', 'elephant'],
       'correctAnswer': 'cat',
-      'key': 'question_two'
+      'key': 'Step 2'
     },
     {
       'question': 'what your favorite food?',
       'answers': ['pizza', 'burger', 'pasta', 'sandwich'],
       'correctAnswer': 'burger',
-      'key': 'question_three'
+      'key': 'Step 3'
     },
     {
       'question': 'what your favorite movie?',
       'answers': ['Titanic', 'Avatar', 'Inception', 'Interstellar'],
       'correctAnswer': 'Avatar',
-      'key': 'question_four'
+      'key': 'Step 4'
     },
   ];
 
@@ -49,11 +49,10 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: ScaffoldMessenger( // Wrap your Scaffold with ScaffoldMessenger
+      home: ScaffoldMessenger(
         child: Scaffold(
           backgroundColor: const Color.fromARGB(255, 232, 206, 232),
-          body: 
-          Builder(
+          body: Builder(
             builder: (context) {
               return SafeArea(
                 child: Padding(
@@ -78,10 +77,26 @@ class _MyAppState extends State<MyApp> {
                               const SizedBox(
                                 height: 35,
                               ),
-                              Text(
-                                question[questionIndex]['key'] as String,
-                                style: const TextStyle(
-                                  fontSize: 15,
+                              Row(
+                                children: [
+                                  Text(
+                                    question[questionIndex]['key'] as String ,
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold
+                                    ),
+                                  ),
+                                  const Text('of 4',
+                                   style: TextStyle(color: Colors.grey),)
+
+                                ],
+                              ),
+                              LinearProgressIndicator(
+                                value: (questionIndex + 1) / question.length,
+                                backgroundColor:
+                                    const Color.fromARGB(255, 236, 213, 230),
+                                valueColor: const AlwaysStoppedAnimation<Color>(
+                                  Colors.black,
                                 ),
                               ),
                               const SizedBox(
@@ -176,16 +191,21 @@ class _MyAppState extends State<MyApp> {
                                       });
                                       debugPrint('Index: $questionIndex');
                                     } else {
-                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content:Text('Please select an answer before proceeding.'),
-                                       backgroundColor: Color.fromARGB(255, 236, 213, 230),
-
-                                      ));
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                              'Please select an answer before proceeding.'),
+                                          backgroundColor:
+                                              Color.fromARGB(255, 236, 213, 230),
+                                        ),
+                                      );
                                     }
                                   },
                                   child: const Text('Next'),
                                 ),
-                              )
+                              ),
+                              const SizedBox(height: 20),
                             ],
                           )
                         : Builder(
@@ -200,33 +220,63 @@ class _MyAppState extends State<MyApp> {
                                         fontWeight: FontWeight.bold),
                                   ),
                                   const SizedBox(height: 20),
+                                  if (score == question.length || score == question.length - 1)
+                                    const Text(
+                                      '😊', 
+                                      style: TextStyle(fontSize: 40),
+                                    )
+                                  else
+                                    const Text(
+                                      '😠', 
+                                      style: TextStyle(fontSize: 40),
+                                    ),
+                                  const SizedBox(height: 10),
                                   Text(
                                     'Score: $score / ${question.length}',
                                     style: const TextStyle(fontSize: 18),
                                   ),
                                   const SizedBox(height: 20),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            questionIndex = 0;
-                                            score = 0;
-                                            showScore = false;
-                                            selectedAnswer = null;
-                                          });
-                                        },
-                                        child: const Text('Restart Quiz'),
-                                      ),
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          SystemNavigator.pop();
-                                        },
-                                        child: const Text('Exit Quiz'),
-                                      ),
-                                    ],
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (_) => AlertDialog(
+                                          title: const Text('Quiz Completed'),
+                                          content: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                'Score: $score / ${question.length}',
+                                                style: const TextStyle(fontSize: 18),
+                                              ),
+                                              const SizedBox(height: 20),
+                                              const Text('Congratulations! You completed the quiz.'),
+                                            ],
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                                setState(() {
+                                                  questionIndex = 0;
+                                                  score = 0;
+                                                  showScore = false;
+                                                  selectedAnswer = null;
+                                                });
+                                              },
+                                              child: const Text('Restart Quiz'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                SystemNavigator.pop();
+                                              },
+                                              child: const Text('Exit Quiz'),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                    child: const Text('Show Details'),
                                   ),
                                 ],
                               );
@@ -235,7 +285,7 @@ class _MyAppState extends State<MyApp> {
                   ),
                 ),
               );
-            }
+            },
           ),
         ),
       ),
